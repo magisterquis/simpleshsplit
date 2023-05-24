@@ -6,7 +6,7 @@ package simpleshsplit
  * Split shell commands, very simply
  * By J. Stuart McMurray
  * Created 20180803
- * Last Modified 20180803
+ * Last Modified 20230524
  */
 
 // Split splits b into space-separated substrings.  A space may be escaped by
@@ -17,7 +17,7 @@ func Split(s string) []string {
 		w  []rune
 		ss []string
 	)
-	for _, r := range []rune(s) {
+	for _, r := range s {
 		switch r {
 		case '\\':
 			/* If this is the first backslash in a pair note it */
