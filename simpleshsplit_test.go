@@ -5,12 +5,13 @@ package simpleshsplit
  * Tests for simpleshsplit
  * By J. Stuart McMurray
  * Created 20180803
- * Last Modified 20180803
+ * Last Modified 20230818
  */
 
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"testing"
 )
 
@@ -23,6 +24,44 @@ func TestSplit(t *testing.T) {
 		if got := Split(have); !reflect.DeepEqual(got, want) {
 			t.Errorf("have:%q got:%q want:%q", have, got, want)
 		}
+	}
+}
+
+func TestSplitOn(t *testing.T) {
+	for _, c := range []struct {
+		have string
+		esc  rune
+		want []string
+	}{{
+		have: `a b`,
+		esc:  '^',
+		want: []string{`a`, `b`},
+	}, {
+		have: `a^ b c^  ^ d   e`,
+		esc:  '^',
+		want: []string{`a b`, `c `, ` d`, `e`},
+	}, {
+		have: `a^^b c^^^ d e^^ f`,
+		esc:  '^',
+		want: []string{`a^b`, `c^ d`, `e^`, `f`},
+	}, {
+		have: `foo^ bar\ tridge`,
+		esc:  '^',
+		want: []string{`foo bar\`, `tridge`},
+	}, {
+		have: `ls foo\bar^ tridge`,
+		esc:  '^',
+		want: []string{`ls`, `foo\bar tridge`},
+	}} {
+		c := c /* :C */
+		t.Run(c.have, func(t *testing.T) {
+			t.Parallel()
+			got := SplitOn(c.have, c.esc)
+			if slices.Equal(got, c.want) {
+				return
+			}
+			t.Errorf("got: %q", got)
+		})
 	}
 }
 
